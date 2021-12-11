@@ -124,7 +124,8 @@ def get_module_data(module):
     time = module_time(module)
     desc = module_desc(module)
     link = module_link(module)
-    mdoule_data = {'name':name, 'version':version, 'released_time':time, 'description':desc, 'link':link}
+    mdoule_data = {'name': name, 'version': version,
+                   'released_time': time, 'description': desc, 'link': link}
     # print('module_data: ')
     # print('')
     return mdoule_data
@@ -150,7 +151,21 @@ def extractModules(modulesSoup):
 
 
 def storePageModulesCsv(modules_data):
-    return ''
+    # print(modules_data[0]['name'])
+    # notificationcenter
+    # wunderpy2
+    # entry-logger-sanic
+    path = 'python_libraries.csv'
+    try:
+        with open(path, 'a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file, delimiter=',')
+            for module in modules_data:
+                module_row = [module['name'], module['version'],
+                              module['released_time'], module['description'], module['link']]
+                csv_writer.writerow(module_row)
+    except FileExistsError:
+        return {'modules_num': len(modules_data), 'success': False}
+    return {'modules_num': len(modules_data), 'success': True}
 
 
 def pythonModules():
@@ -168,17 +183,18 @@ def pythonModules():
             # extract modules-info from url
             modules_data = extractModules(modulesSoup)
             # store modules-data in csv file
-            # modulesInfo = storePageModulesCsv(modules_data)
-            print('------------')
-            print('> url: ', url)
-            print(modules_data)
-            print('------------')
-            # print('> modules: ', modulesInfo.modules_num)
-            # if modulesInfo.success:
-            #     print('success store!')
-            # else:
-            #     print('failed store!')
+            csv_store_results = storePageModulesCsv(modules_data)
+            # print(csv_store_results)
             # print('------------')
+            print('> url: ', url)
+            # print(modules_data)
+            print('------------')
+            print('> number of modules: ', csv_store_results['modules_num'])
+            if csv_store_results['success']:
+                print('success store!')
+            else:
+                print('failed store!')
+            print('------------')
         else:
             print('------------')
             print('error in url: ', url)
@@ -187,6 +203,8 @@ def pythonModules():
 
 
 pythonModules()
+
+# print("first_name,last_name,age".split(","))
 
 # # print('https://pypi.org/search/?c=Topic+%3A%3A+Software+Development+%3A%3A+Libraries+%3A%3A+Python+Modules&page=',str(1))
 
